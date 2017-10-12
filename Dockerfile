@@ -47,7 +47,4 @@ RUN git clone https://github.com/Jeansen/cdmn.git && \
 
 WORKDIR /
 
-COPY entrypoint.sh /
-RUN  chmod +x /entrypoint.sh
-
 CMD xrdb -load /Xresources && urxvt -pe cdmn
