@@ -1,11 +1,7 @@
-FROM debian:testing
+FROM ubuntu:16.04
 ARG DEBIAN_FRONTEND=noninteractive
 
-RUN echo "deb http://http.us.debian.org/debian/ testing main contrib non-free" > /etc/apt/sources.list && \
-  echo "deb http://security.debian.org/ testing/updates main contrib non-free" >> /etc/apt/sources.list && \
-  echo "deb http://http.us.debian.org/debian/ testing-updates main contrib non-free" >> /etc/apt/sources.list && \
-
-  apt-get update && apt-get install -y \
+RUN apt-get update && apt-get upgrade -y && apt-get install -y \
   locales \
   curl \
   xterm \
@@ -23,10 +19,13 @@ RUN echo "deb http://http.us.debian.org/debian/ testing main contrib non-free" >
   perl \
   libfilesys-df-perl \
   libparams-validate-perl \
+  libproc-processtable-perl \
   libxft-dev \
   libperl-dev \
   checkinstall \
-  git && \
+  git \
+  supervisor \
+  openssh-server && \
   apt-get remove -y rxvt-unicode-256color && \
   apt-get clean && \ 
   rm -rf /var/lib/apt/lists/* && localedef -i en_US -c -f UTF-8 -A /usr/share/locale/locale.alias en_US.UTF-8
@@ -45,6 +44,20 @@ RUN git clone https://github.com/Jeansen/cdmn.git && \
   ./configure --enable-everything --enable-256-color && \
   make && checkinstall -y
 
+RUN mkdir /var/run/sshd
+RUN echo 'root:test' | chpasswd
+RUN sed -i 's/PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config
+
+# SSH login fix. Otherwise user is kicked off after login
+RUN sed 's@session\s*required\s*pam_loginuid.so@session optional pam_loginuid.so@g' -i /etc/pam.d/sshd
+
+ENV NOTVISIBLE "in users profile"
+RUN echo "export VISIBLE=now" >> /etc/profile
+
+EXPOSE 22
+
 WORKDIR /
 
-CMD xrdb -load /Xresources && urxvt -pe cdmn
+COPY entrypoint.sh entrypoint.sh
+
+CMD /entrypoint.sh
