@@ -25,6 +25,7 @@ RUN apt-get update && apt-get upgrade -y && apt-get install -y \
   checkinstall \
   git \
   supervisor \
+  stress-ng \
   openssh-server && \
   apt-get remove -y rxvt-unicode-256color && \
   apt-get clean && \ 
