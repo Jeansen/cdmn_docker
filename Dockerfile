@@ -1,4 +1,4 @@
-FROM ubuntu:16.04
+FROM ubuntu:18.04
 ARG DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get update && apt-get upgrade -y && apt-get install -y \
@@ -26,6 +26,7 @@ RUN apt-get update && apt-get upgrade -y && apt-get install -y \
   git \
   supervisor \
   stress-ng \
+  vim \
   openssh-server && \
   apt-get remove -y rxvt-unicode-256color && \
   apt-get clean && \ 
